@@ -13,7 +13,7 @@ const cookieExtractor = req => {
     return token;
 };
 
-passport.use {
+passport.use(
     'login',
     new LocalStrategy (
         { usernameField: 'email', passwordField:' password' },
@@ -33,7 +33,7 @@ passport.use {
             }
         }
     )
-};
+);
 
 passport.use(
     new JWTStrategy(
