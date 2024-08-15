@@ -1,4 +1,4 @@
-import ProductModel from './models/product.model';
+import ProductModel from './models/product.model.js';
 
 class ProductDAO {
     async getProducts(filters, options) {

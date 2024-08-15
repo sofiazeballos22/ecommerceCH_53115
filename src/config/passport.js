@@ -1,8 +1,10 @@
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { Strategy as JWTStrategy, ExtractJWT as ExtractJWT } from 'passport-jwt';
-import UserService from '../services/user.service';
+import pkg from 'passport-jwt';
+import UserService from '../services/user.service.js';
 import bcrypt from 'bcrypt';
+
+const { Strategy: JWTStrategy, ExtractJwt: ExtractJWT } = pkg;
 
 const cookieExtractor = req => {
     let token = null;
@@ -14,19 +16,19 @@ const cookieExtractor = req => {
 
 passport.use(
     'login',
-    new LocalStrategy (
-        { usernameField: 'email', passwordField:' password' },
+    new LocalStrategy(
+        { usernameField: 'email', passwordField: 'password' }, // Corregido el espacio extra
         async (email, password, done) => {
             try {
                 const user = await UserService.getUserByEmail(email);
                 if (!user) {
-                    return done(null, false, {message: 'Usario no valido'});
+                    return done(null, false, { message: 'Usuario no válido' });
                 }
                 const validate = await bcrypt.compare(password, user.password);
                 if (!validate) {
-                    return done(null, false, { message: 'Contraseña incorrecta'});
+                    return done(null, false, { message: 'Contraseña incorrecta' });
                 }
-                return done(null, user, { message: 'Logueado existosamente'});
+                return done(null, user, { message: 'Logueado exitosamente' });
             } catch (error) {
                 return done(error);
             }
@@ -54,7 +56,6 @@ passport.use(
         }
     )
 );
-
 
 const initializePassport = () => {
     passport.serializeUser((user, done) => {

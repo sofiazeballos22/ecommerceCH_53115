@@ -1,6 +1,6 @@
 import  dotenv  from 'dotenv';
 
-config()
+dotenv.config()
 
 export default  {
     refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,

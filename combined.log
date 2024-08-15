@@ -1,0 +1,2 @@
+{"level":"info","message":"MongoDB connected...","service":"user-service","timestamp":"2024-08-15 00:48:37"}
+{"level":"info","message":"Server running on port 8080","service":"user-service","timestamp":"2024-08-15 00:48:37"}

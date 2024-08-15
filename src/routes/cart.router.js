@@ -1,8 +1,9 @@
-const { Router } = require('express');
-const CartController = require('../controllers/cartController');
+import { Router } from 'express';
+import CartController from '../controllers/cartController.js'; 
+
 
 const router = Router();
-import { authenticate } from '../'
+import { authenticate } from '../middleware/auth.js';
 
 router.post('/', CartController.createCart);
 router.get('/:cid', authenticate,  CartController.getCartById); 
@@ -16,4 +17,4 @@ router.delete('/:cid', CartController.deleteAllProductsFromCart);
 router.post('/add/:pid', authenticate, CartController.addProductToCart);
 
 
-module.exports = router;
+export default router;

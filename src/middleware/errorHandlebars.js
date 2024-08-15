@@ -1,38 +1,16 @@
-import jwt from 'jsonwebtoken';
-import config from '../config/index.js';
-import UserService from '../services/user.service.js';
-const { jwtSecret, refreshTokenSecret } = config;
+import createError from 'http-errors';
+import logger from '../config/logger.js';
 
-
-  export const authenticate = async (req, res, next) => {
-
-  const token = req.cookies.jwt;
-
-  if (!token) {
-    return res.status(401).json({ error: 'Access denied' });
+const errorHandler = (err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
   }
 
-  try {
-    const decoded = jwt.verify(token, jwtSecret);
-    const user = await UserService.getUserById(decoded.id); // Usamos el UserService para obtener el usuario
-    if (!user) {
-      return res.status(401).json({ error: 'Access denied' });
-    }
-    req.user = user;
-    next();
-  } catch (error) {
+  logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
 
-    res.status(400).json({ error: 'Invalid token' });
-  }
+  const error = createError(err.status || 500, err.message);
+  res.status(error.status).json({ error: error.message });
 };
 
-//exports.authorize = (roles) => {
-  export const authorize = (roles) => {
-
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-    next();
-  };
-};
+// Aquí es donde defines la exportación predeterminada
+export default errorHandler;

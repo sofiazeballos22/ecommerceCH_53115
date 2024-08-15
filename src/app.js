@@ -31,8 +31,7 @@ const __dirname = dirname(__filename);
 const app = express();
 
 
-app.engine('handlebars', hbs.engine); // Usar la instancia personalizada de Handlebars
-app.set('view engine', 'handlebars');
+
 app.set('views', join(__dirname, 'views'));
 app.use(express.json());
 app.use(cookieParser());

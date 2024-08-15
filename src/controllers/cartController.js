@@ -1,6 +1,5 @@
 import CartService from '../services/cart.service.js';
-import TicketService from '../services/ticket.service.js';
-import ProductService from '../services/product.service.js'
+
 
 
 const purchaseCart = async (req, res) => {
@@ -62,7 +61,7 @@ const createCart = async (req, res) => {
 
         
 
-exports.getCartByUser = async (req, res) => {
+const getCartByUser = async (req, res) => {
     try {
     const userId = req.user.id;
     
@@ -161,3 +160,14 @@ const updateProductQuantity = async (req, res) => {
 
         
    
+export default {
+    getCartByUser,
+    purchaseCart,
+    createCart,
+    getCartById,
+    addProductToCart,
+    updateCart,
+    updateProductQuantity,
+    deleteProductFromCart,
+    deleteAllProductsFromCart
+}
