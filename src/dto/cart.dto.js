@@ -1,11 +1,17 @@
 class CartDTO {
-    constructor({ _id, products }) {
-        this.id = _id;
+    constructor({ _id, user, products }) {
+        this.id = _id.toString();
+        this.user = user.toString();
         this.products = products.map(product => ({
-            product: product.product._id,
+           product: {
+                id: product.product._id.toString(), 
+                title: product.product.title,
+                price: product.product.price,
+                stock: product.product.stock,
+            },
             quantity: product.quantity
         }));
     }
 }
 
-module.exports = CartDTO;
+export default CartDTO;

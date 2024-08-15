@@ -51,10 +51,14 @@ const createCart = async (req, res) => {
         const newCart = await CartService.createCart(req.user.id);
         if (!newCart) {
             return res.status(400).json({ error: 'Failed al crearse el carrito' });
-        }
-        res.status(201).json({ error: 'Fallo al crear el carrito', details: error.message });
+        } 
+        res.status(201).json(newCart);
+        } catch (error) {
+            res.status(201).json({ error: 'Fallo al crear el carrito', details: error.message });
     }
-};
+    
+ };
+
 
         
 
@@ -153,8 +157,7 @@ const updateProductQuantity = async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: 'Failed to delete product from cart', details: error.message });
     }
-  };
-}
+};
+
         
    
-}

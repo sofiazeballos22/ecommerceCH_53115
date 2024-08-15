@@ -85,7 +85,40 @@ const refreshToken = async (req, res) => {
         res.status(500).json({ error: 'Failed to refresh token', details: error.message });
     }
 };
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        await UserService.requestPasswordReset(email);
+        res.redirect('/login'); 
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to request password reset', details: error.message });
+    }
+};
 
+const resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+        await UserService.resetPassword(token, newPassword);
+   res.redirect('/login'); // Redirige al login después de que la contraseña ha sido cambiada
+  
+       // res.json({ message: 'Password has been reset' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const deleteInactiveUsers = async (req, res) => {
+    try {
+      const deletedUsers = await UserService.deleteInactiveUsers();
+      res.json({ message: 'Inactive users deleted successfully', deletedUsers });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to delete inactive users', details: error.message });
+    }
+};
+
+const getCurrentUser = (req, res) => {
+    res.json(req.user);
+};
 const logout = async (req, res) => {
     try {
         const { refreshToken } = req.cookies;
@@ -154,41 +187,16 @@ const upgradeToPremium = async (req,res) => {
         res.status(500).json({ error: 'Failed to upgrade user', details: error.message });
     }
 };
-
-const forgotPassword = async (req, res) => {
+const manageUsers = async(req, res) => {
     try {
-        const { email } = req.body;
-        await UserService.requestPasswordReset(email);
-        res.redirect('/login'); 
+      const users = await UserService.getAllUsers(); // Obten todos los usuarios desde el servicio
+     
+      res.render('managerUsers', { users });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to request password reset', details: error.message });
+      res.status(500).json({ error: 'Failed to fetch users', details: error.message });
     }
-};
+  };
 
-const resetPassword = async (req, res) => {
-    try {
-        const { token, newPassword } = req.body;
-        await UserService.resetPassword(token, newPassword);
-   res.redirect('/login'); // Redirige al login después de que la contraseña ha sido cambiada
-  
-       // res.json({ message: 'Password has been reset' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-const deleteInactiveUsers = async (req, res) => {
-    try {
-      const deletedUsers = await UserService.deleteInactiveUsers();
-      res.json({ message: 'Inactive users deleted successfully', deletedUsers });
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to delete inactive users', details: error.message });
-    }
-};
-
-const getCurrentUser = (req, res) => {
-    res.json(req.user);
-};
 
 
 export default {

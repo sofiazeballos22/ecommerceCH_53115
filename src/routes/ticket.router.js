@@ -1,8 +1,13 @@
-const { Router } = require('express');
-const TicketController = require('../controllers/ticket.controller');
+
+import { Router } from 'express';
+import TicketController from '../controllers/ticket.controller.js';
+import { authenticate, authorize } from '../middleware/auth.js'; // Asegúrate de usar el middleware de autenticación
 
 const router = Router();
 
-router.post("/", TicketController.createTicket);
+router.post('/', TicketController.createTicket);
 
-module.exports = router;
+
+export default router;
+
+

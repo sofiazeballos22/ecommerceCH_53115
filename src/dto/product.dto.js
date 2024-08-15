@@ -9,7 +9,8 @@ class ProductDTO {
         this.stock = stock;
         this.category = category;
         this.thumbails = thumbails;
+        this.owner = owner;
     }
 }
 
-module.exports = ProductDTO;
+export default ProductDTO;

@@ -14,20 +14,7 @@ import ProductService from '../services/product.service.js';
   };
 
  
-  export const getProductById = async (req, res) => {
-    try {
-      const product = await ProductService.getProductById(req.params.pid);
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
-      res.json(product);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch product', details: error.message });
-    }
-  };
-  
-
-    export const createProduct = async (req, res) => {
+  export const createProduct = async (req, res) => {
 
     try {
       const productData = {
@@ -81,3 +68,15 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ error: 'Failed to delete product', details: error.message });
   }
 };
+  export const getProductById = async (req, res) => {
+    try {
+      const product = await ProductService.getProductById(req.params.pid);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      res.json(product);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch product', details: error.message });
+    }
+  };
+  
