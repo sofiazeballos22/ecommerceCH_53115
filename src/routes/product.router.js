@@ -1,5 +1,8 @@
 const { Router } = require('express');
 const { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct } = require('../controllers/productController');
+const ProductModel = require('../dao/mongo/models/product.model')
+
+
 const router = Router();
 router.get('/', getAllProducts);
 router.get('/:pid', getProductById);

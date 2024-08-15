@@ -1,9 +1,8 @@
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const JWTStrategy = require('passport-jswt').Strategy;
-const ExtractJWT = require('passport-jwt').ExtractJwt;
-const UserService = require('../services/user.service');
-const bcrypt = require('bcrypt');
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { Strategy as JWTStrategy, ExtractJWT as ExtractJWT } from 'passport-jwt';
+import UserService from '../services/user.service';
+import bcrypt from 'bcrypt';
 
 const cookieExtractor = req => {
     let token = null;
@@ -56,19 +55,20 @@ passport.use(
     )
 );
 
-module.exports = {
-    initializePassport: () => {
-        passport.serializeUser((user, done) => {
-            done(null, user.id);
-        });
 
-        passport.deserializeUser(async (id, done) => {
-            try {
-                const user = await UserService.getUserById(id);
-                done(null, user);
-            } catch (error) {
-                done(error, null);
-            }
-        });
-    }
+const initializePassport = () => {
+    passport.serializeUser((user, done) => {
+        done(null, user.id);
+    });
+
+    passport.deserializeUser(async (id, done) => {
+        try {
+            const user = await UserService.getUserById(id);
+            done(null, user);
+        } catch (error) {
+            done(error, null);
+        }
+    });
 };
+
+export default initializePassport;

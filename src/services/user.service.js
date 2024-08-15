@@ -31,6 +31,16 @@ class UserService {
         const user = await UserDAO.upgradeToPremium(userId);
         return new UserDTO(user);
     }
+
+    async updateUserRefreshTokens(userId, refreshTokens) {
+        const user = await UserDAO.updateUserRefreshTokens(userId, refreshTokens);
+        return updatedUser ? new UserDTO(updatedUser) : null;
+    }
+
+    async upgradeToPremium(userId) {
+        const user = await UserDAO.upgradeToPremium(userId); 
+        return user;
+    }
 }
 
 module.exports = new UserService();

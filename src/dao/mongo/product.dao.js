@@ -1,4 +1,4 @@
-const ProductModel = require('./models/product.model');
+import ProductModel from './models/product.model';
 
 class ProductDAO {
     async getProducts(filters, options) {
@@ -28,6 +28,13 @@ class ProductDAO {
     }
 
     async deleteProduct(id) {
-        return await ProductModel.findByIdDelete(id);
+        const product = await ProductModel.findById(id);
+        if (!product) {
+          throw new Error('Product not found');
+        }
+        await ProductModel.findByIdAndDelete(id); // Elimina el producto directamente
+        return product;
     }
 }
+
+export default new ProductDAO();

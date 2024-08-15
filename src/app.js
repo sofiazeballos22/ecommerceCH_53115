@@ -7,11 +7,21 @@ const compression = require('express-compression');
 const { mongoUri, dbName } = require('./config');
 const session = require('express-session')
 const productRoutes = require('./routes/product.router');
-const CartRoutes = require('./routes/cart.router');
+const cartRoutes = require('./routes/cart.router'); 
 const MongoStore = require('connect-mongo');
 const userRoutes = require('./routes/user.router');
 const exphbs = require('express-handlebars');
 const { initializePassport } = require('./config/passport');
+
+
+const apiUrl = 'https://tubackend.railway.app/api'; // Cambia esto a la URL de tu backend en Railway
+
+//  llamada a una API
+fetch(`${apiUrl}/ruta`)
+    .then(response => response.json())
+    .then(data => console.log(data));
+
+
 
 const app = express();
 app.use(express.json());
@@ -29,7 +39,7 @@ app.use(express.static(`${__dirname}/public`));
 app.use(session({
     secret: process.env.JWT_SECRET,
     resave: false,
-    saveUninitiliazed: false,
+    saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URI,
         ttl: 7 * 24 * 60 * 60
@@ -38,7 +48,7 @@ app.use(session({
 
 
 initializePassport();
-app.use(passport.initilize());
+app.use(passport.initialize());  
 app.use(passport.session());
 
 

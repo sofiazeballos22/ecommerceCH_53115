@@ -8,8 +8,18 @@ const UserSchema = new Schema({
     age: { type: Number, required: true },
     password: { type: String, required: true },
     cart: { type: Schema.Types.ObjectId, ref: 'Cart' },
-    refreshTokens: [{ type: String }],
-    last_connection: { type: Date }
-})
+    refreshTokens: { type: [String], default: [] },
+    role: { type: String, default: 'user'},
+    last_connection: { type: Date, default: null },
+    documents: [
+        {
+            name: { type: String },
+            reference: { type: String },
+        },
+    ],
+    isAdminUpgrade: { type: Boolean, default: false },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
+});
 
-module.exports = mongoose.model('User', userSchema);
+export default mongoose.model('User', UserSchema);
