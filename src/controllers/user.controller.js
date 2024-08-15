@@ -39,6 +39,20 @@ const login = async (req, res) => {
 
         res.cookie('jwt', token, { httpOnly: true, secure: true });
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Solo en HTTPS en producción
+            sameSite: 'lax',
+            path: '/', // Asegura que la cookie esté disponible para todas las rutas
+          });
+    
+          res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Solo en HTTPS en producción
+            sameSite: 'lax',
+            path: '/', // Asegura que la cookie esté disponible para todas las rutas
+          });
         res.direct('/products');
 
         if (user.role === 'admin') {
@@ -78,6 +92,19 @@ const refreshToken = async (req, res) => {
         user.refreshTokens.push(newRefreshToken);
         await user.save();
 
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Solo en HTTPS en producción
+            sameSite: 'lax',
+            path: '/', // Asegura que la cookie esté disponible para todas las rutas
+          });
+    
+          res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Solo en HTTPS en producción
+            sameSite: 'lax',
+            path: '/', // Asegura que la cookie esté disponible para todas las rutas
+          });
         res.cookie('jwt', newToken, { httpOnly: true, scure: true });
         res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: true });
         res.json({ message: 'Token refreshed' });
