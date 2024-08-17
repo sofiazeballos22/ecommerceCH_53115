@@ -33,11 +33,10 @@ const login = async (req, res) => {
         const { email, password } = req.body;
         const { token, refreshToken, user } = await UserService.login(email, password);
 
-        // Configuración adecuada de las cookies con SameSite y secure dependiendo del entorno
         res.cookie('jwt', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',  // En producción asegura HTTPS
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',  // 'None' para diferentes dominios
+            sameSite: 'None', // Cambiado a None
             path: '/',  // Disponible para todas las rutas
             domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'  // Dominio correcto
         });
@@ -45,7 +44,7 @@ const login = async (req, res) => {
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',  // En producción asegura HTTPS
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',  // 'None' para diferentes dominios
+            sameSite: 'None', // Cambiado a None
             path: '/',  // Disponible para todas las rutas
             domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'  // Dominio correcto
         });
@@ -78,7 +77,7 @@ const refreshToken = async (req, res) => {
         res.cookie('jwt', newToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            sameSite: 'None', // Cambiado a None
             path: '/',
             domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
         });
@@ -86,7 +85,7 @@ const refreshToken = async (req, res) => {
         res.cookie('refreshToken', newRefreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            sameSite: 'None', // Cambiado a None
             path: '/',
             domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
         });
