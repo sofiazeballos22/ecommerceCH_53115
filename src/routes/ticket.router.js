@@ -5,7 +5,7 @@ import { authenticate, authorize } from '../middleware/auth.js'; // Asegúrate d
 
 const router = Router();
 
-router.post('/', TicketController.createTicket);
+router.get('/:tid', authenticate, TicketController.getTicketById);
 
 
 export default router;

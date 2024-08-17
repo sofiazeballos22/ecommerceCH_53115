@@ -4,41 +4,51 @@ import CartService from '../services/cart.service.js';
 
 const purchaseCart = async (req, res) => {
     try {
-        const userId = req.user.id;
-        const userEmail = req.user.email; 
-        const cartId = req.params.cid;
-        
-        const { ticket, errors } = await CartService.purchaseCart(cartId, userId, userEmail);
+      // Log inicial con el ID del usuario y el correo
+      const userId = req.user.id;
+      const userEmail = req.user.email; 
+      const cartId = req.params.cid;
   
-        
-        const plainTicket = {
-            code: ticket.code,
-            purchase_datetime: ticket.purchase_datetime,
-            amount: ticket.amount,
-            purchaser: ticket.purchaser,
-            id: ticket._id 
-        };
       
-        if (ticket) {
-          return res.json({ ticket: plainTicket, errors });
-        } else {
-            return res.status(400).json({ error: 'No se pudo generar el ticket.' });
-        }
-      } catch (error) {
-        if (error.message === 'No se puede completar la compra con un carrito vacío') {
-            return res.status(400).json({ error: error.message });
-        } else {
-            res.status(500).json({ error: 'Failed to complete purchase', details: error.message });
-        }
+      // Intentar realizar la compra
+      const { ticket, errors } = await CartService.purchaseCart(cartId, userId, userEmail);
+  
+      // Verificación y transformación del ticket para la respuesta
+      if (ticket) {
+        const plainTicket = {
+          code: ticket.code,
+          purchase_datetime: ticket.purchase_datetime,
+          amount: ticket.amount,
+          purchaser: ticket.purchaser,
+          id: ticket._id 
+        };
+  
+  
+        return res.json({ ticket: plainTicket, errors });
+      } else {
+        console.error('No se pudo generar el ticket');
+        return res.status(400).json({ error: 'No se pudo generar el ticket.' });
+      }
+    } catch (error) {
+      console.error('Error durante el proceso de compra:', error.message);
+  
+      if (error.message === 'No se puede completar la compra con un carrito vacío') {
+        console.warn('El carrito está vacío:', error.message);
+        return res.status(400).json({ error: error.message });
+      } else {
+        console.error('Error inesperado al completar la compra:', error);
+        return res.status(500).json({ error: 'Failed to complete purchase', details: error.message });
+      }
     }
   };
-
+  
 const getCartById = async (req, res) => {
     try {
         const cart = await CartService.getCartById(req.params.cid); 
         if (!cart) {
             return res.status(404).json({ error: 'El carrito no funciona'});
         }
+
         res.json(cart);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch cart', details: error.message });
@@ -61,21 +71,25 @@ const createCart = async (req, res) => {
 
         
 
-const getCartByUser = async (req, res) => {
+ const getCartByUser = async (req, res) => {
     try {
-    const userId = req.user.id;
-    
 
-    const cart = await
-    CartService.getCartById(userId);
-    
-    if (!cart) {
-        return res.status(404).json({ error: 'El carrito no funciona'});
-    }
+        const userId = req.user.id;
 
-    res.render('cart',{ cart });
+        let cart = await CartService.getCartByUserId(userId);
+        if (!cart) {
+
+            // Aquí puedes decidir si crear un carrito automáticamente para el usuario
+            cart = await CartService.createCart(userId);
+        }
+            if (!cart) {
+                return res.status(500).json({ error: 'Failed to create cart' });
+            }
+
+        res.json(cart);
     } catch (error) {
-        res.status(500).json({ error: details.error})
+        console.error("Error al obtener el carrito del usuario:", error.message);
+        res.status(500).json({ error: 'Failed to fetch cart', details: error.message });
     }
 };
 
@@ -97,7 +111,7 @@ const addProductToCart = async (req, res) => {
 
         }  
 
-        const updatedCart = await CartService.addProductToCart(card.id, productId);
+        const updatedCart = await CartService.addProductToCart(cart.id, productId);
         if (!updatedCart) {
             return res.status(404).json({ error: 'El carrito y el producto no responden' });
         }  

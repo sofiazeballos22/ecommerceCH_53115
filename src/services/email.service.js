@@ -33,7 +33,6 @@ export const sendTicketEmail = async (to, ticket) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Ticket email sent to:', to);
   } catch (error) {
     console.error('Error sending ticket email:', error);
   }

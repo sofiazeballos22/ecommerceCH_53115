@@ -1,7 +1,7 @@
 import User from '../mongo/models/user.model.js';
 
 class UserDAO {
-    async createUser(UserData) {
+    async createUser(userData) {
         return await User.create(userData);
     }
 
@@ -12,6 +12,9 @@ class UserDAO {
     async getUserById(userId) {
         return await User.findById(userId);
     }
+    async getAllUsers() {
+        return await User.find(); // Obtener todos los usuarios
+      }
 
     async updateUser(userId, updateData) {
         return await User.findByIdAndUpdate(userId, updateData, { new: true });
@@ -75,6 +78,6 @@ class UserDAO {
   async getUserByToken(token) {
     return await User.findOne({ resetPasswordToken: token });
   }
-  
+
 }
 export default new UserDAO();

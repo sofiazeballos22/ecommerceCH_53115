@@ -6,6 +6,7 @@ import CartDAO from '../dao/mongo/cart.dao.js';
 import ProductDAO from '../dao/mongo/product.dao.js';
 import CartDTO from '../dto/cart.dto.js';
 import TicketService from '../services/ticket.service.js';
+import UserDAO from '../dao/mongo/user.dao.js'; // Importar el DAO de usuario
 
 class CartService {
   async createCart(userId) {
@@ -14,7 +15,13 @@ class CartService {
      if (!cart) {
       throw new Error('No se pudo crear el carrito');
   }
-
+ // Asociar el carrito al usuario
+ const user = await UserDAO.getUserById(userId);
+ if (user) {
+   user.cart = cart._id; // Asignar el ID del carrito al campo `cart` del usuario
+   await user.save(); // Guardar el usuario con la referencia del carrito actualizada
+ // Verificar la asociación
+ }
     return new CartDTO(cart);
   }
 
@@ -41,7 +48,7 @@ async getCartByUserId(userId) {
     if (!updatedCart) {
       throw new Error('Carrito o producto no encontrado');
     }
-
+   
     return new CartDTO(updatedCart);
   }
 
@@ -109,7 +116,6 @@ async getCartByUserId(userId) {
         userId: userId
     };
 
-    console.log('Datos del ticket:', ticketData);
 
     const ticket = await TicketService.createTicket(ticketData);
 

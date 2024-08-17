@@ -8,7 +8,7 @@ import TicketController from '../controllers/ticket.controller.js';
 
 
 const router = Router();
-
+/*
 router.get('/products', async (req, res) => {
   try {
     const products = await ProductService.getProducts(req.query);
@@ -17,7 +17,8 @@ router.get('/products', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch products', details: error.message });
   }
 });
-
+*/
+/*
 router.get('/products/:pid', async (req, res) => {
   try {
     const product = await ProductService.getProductById(req.params.pid);
@@ -25,8 +26,8 @@ router.get('/products/:pid', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch product', details: error.message });
   }
-});
-
+});*/
+/*
 router.get('/carts/:cid', async (req, res) => {
   try {
     const cart = await CartService.getCartById(req.params.cid);
@@ -34,27 +35,17 @@ router.get('/carts/:cid', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch cart', details: error.message });
   }
-});
+});*/
+
 router.get('/login', (req, res) => {
     res.render('login');
 });
-  
-router.get('/register', (req, res) => {
-    res.render('register');
-});
 
-router.get('/forgot-password', (req, res) => {
-    res.render('forgot-password');
-});
-  
-router.get('/reset-password', (req, res) => {
-    const { token } = req.query;
-    res.render('reset-password', { token });
-});
 
-router.get('/admin/manage-users', authenticate, authorize(['admin']), UserController.manageUsers);
-router.get('/my-cart', authenticate, CartController.getCartByUser);
-router.get('/ticket/:tid', authenticate, TicketController.getTicketById);
+/*
+router.get('/admin/manage-users', authenticate, authorize(['admin']), UserController.manageUsers);*/
+//router.get('/my-cart', authenticate, CartController.getCartByUser);
+//router.get('/ticket/:tid', authenticate, TicketController.getTicketById);
 
 
   export default router;

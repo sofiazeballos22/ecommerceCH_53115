@@ -23,7 +23,7 @@ const register = async (req, res) => {
             return res.status(201).json(user);
         }
 
-        res.redirect('/login');
+        res.status(201).json({ message: 'Usuario registrado con éxito', user });
     } catch (error) {
         res.status(500).json({ error: 'Fallo al registrar al usuario', details: error.message });
     }
@@ -31,12 +31,11 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        console.log("Request body:", req.body);
-
         const { email, password } = req.body;
         const { token, refreshToken, user } = await UserService.login(email, password);
 
 
+ 
         res.cookie('jwt', token, { httpOnly: true, secure: true });
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
 
@@ -53,26 +52,18 @@ const login = async (req, res) => {
             sameSite: 'lax',
             path: '/', // Asegura que la cookie esté disponible para todas las rutas
           });
-        res.direct('/products');
+              // Verifica si es una solicitud desde Postman o frontend API
+      
 
-        if (user.role === 'admin') {
-            return res.redirect('/admin/manage-users');
-          }
-        return res.redirect('/products');
+        res.status(200).json({    message: 'Login exitoso', 
+            token, refreshToken, user });
+     
     } catch (error) {
-        res.status(401).json({ error: error.message });
+        res.status(401).json({ error: 'Error al iniciar sesión. Verifica tus credenciales.' });
+
     }
 };
 
-const manageUser = async(req, res) => {
-    try {
-        const users = await UserService.getAllUsers();
-
-        res.render('managerUsers', { users });
-    } catch (error) {
-        res.status(500).json({ error: 'Fallo al buscar el usuario', details: error.message });
-    }
-}
 
 const refreshToken = async (req, res) => {
     const { refreshToken } = req.cookies;
@@ -116,7 +107,7 @@ const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         await UserService.requestPasswordReset(email);
-        res.redirect('/login'); 
+        res.status(200).json({ message: 'Password reset link sent' }); // Enviar respuesta JSON
     } catch (error) {
         res.status(500).json({ error: 'Failed to request password reset', details: error.message });
     }
@@ -126,7 +117,7 @@ const resetPassword = async (req, res) => {
     try {
         const { token, newPassword } = req.body;
         await UserService.resetPassword(token, newPassword);
-   res.redirect('/login'); // Redirige al login después de que la contraseña ha sido cambiada
+        res.status(200).json({ message: 'Password has been reset successfully' });
   
        // res.json({ message: 'Password has been reset' });
     } catch (error) {
@@ -196,11 +187,11 @@ const uploadDocuments = async (req, res) => {
 
 const upgradeToPremium = async (req,res) => {
     try {
-        const userId = res.params.uid;
+        const userId = req.params.uid;
         let user;
         
         if (req.user.role === 'admin' ) { 
-            user = await User.Service.upgradeToPremiumAsAdmin(userId);
+            user = await UserService.upgradeToPremiumAsAdmin(userId);
         } else {
             user = await UserService.upgradeToPremium(userId);
         }
@@ -209,16 +200,16 @@ const upgradeToPremium = async (req,res) => {
             return res.status(404).json({ error: 'User not found or missing documents', user });
         }
 
-        res.redirect('/admin/manage-users');
+        res.status(200).json({ message: 'User upgraded successfully', user });
     } catch (error) {
         res.status(500).json({ error: 'Failed to upgrade user', details: error.message });
     }
 };
-const manageUsers = async(req, res) => {
+const manageUsers = async (req, res) => {
     try {
       const users = await UserService.getAllUsers(); // Obten todos los usuarios desde el servicio
-     
-      res.render('managerUsers', { users });
+
+      res.status(200).json(users);
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch users', details: error.message });
     }

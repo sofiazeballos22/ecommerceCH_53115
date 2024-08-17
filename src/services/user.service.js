@@ -85,6 +85,11 @@ async upgradeToPremiumAsAdmin(userId) {
 
     // Almacenar el refresh token
     user.refreshTokens.push(refreshToken);
+
+     // Limitar el número de refresh tokens a 3
+     if (user.refreshTokens.length > 3) {
+      user.refreshTokens = user.refreshTokens.slice(-3); // Mantén solo los últimos 3 tokens
+  }
     await user.save();
 
     return { token, refreshToken , user  };
@@ -117,7 +122,7 @@ async upgradeToPremiumAsAdmin(userId) {
     if (!user) throw new Error('User not found');
 
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetLink = `http://localhost:8080/reset-password?token=${resetToken}`;
+    const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
 
     const tokenExpiration = Date.now() + 3600000; // 1 hora desde el momento actual
 

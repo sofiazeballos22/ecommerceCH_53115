@@ -1,5 +1,4 @@
-//const ProductDAO = require('../dao/mongo/product.dao');
-//const ProductDTO = require('../dto/product.dto');
+
 import ProductDAO from '../dao/mongo/product.dao.js';
 import ProductDTO from '../dto/product.dto.js';
 import { sendMail } from '../config/transport.js';

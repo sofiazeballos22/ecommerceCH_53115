@@ -15,7 +15,7 @@ class ProductDAO {
         };
     }
 
-    async getProducById(id) {
+    async getProductById(id) {
         return await ProductModel.findById(id);
     }
 

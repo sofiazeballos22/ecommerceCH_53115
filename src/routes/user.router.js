@@ -80,6 +80,7 @@ router.get('/', authenticate, authorize(['admin']), async (req, res) => {
 });
 router.delete('/', authenticate, authorize(['admin']), UserController.deleteInactiveUsers);
 
+router.get('/admin/manage-users', authenticate, authorize(['admin']), UserController.manageUsers);
 
 export default router;
 

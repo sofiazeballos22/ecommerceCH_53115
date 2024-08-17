@@ -23,6 +23,7 @@ import { serve, setup } from 'swagger-ui-express';
 import emailRouter from './routes/email.router.js'; // Asegúrate de que la ruta sea correcta
 import exphbs from 'express-handlebars';
 
+import cors from 'cors';
 
 
 
@@ -30,14 +31,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
 
+app.use(cors({
+    origin: 'http://localhost:5173',  // Reemplaza con la URL de tu frontend
+    credentials: true,                // Permitir el envío de credenciales
+}));
 
-
-app.set('views', join(__dirname, 'views'));
+//app.set('views', join(__dirname, 'views'));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-
-
+/*
+app.engine('handlebars', exphbs.engine());
+app.set('view engine', 'handlebars');
+app.set('views', join(__dirname, 'views'));*/
 app.use((req, res, next) => {
   req.logger = logger;
   next();
@@ -63,9 +69,7 @@ const swaggerSpecs = swaggerJSDoc(swaggerOptions);
 app.use('/api-docs', serve, setup(swaggerSpecs));
 
 
-app.engine('handlebars', exphbs.engine());
-app.set('view engine', 'handlebars');
-app.set('views', join(__dirname, 'views'));
+
 
 app.use(compression({
   brotli: { enabled: true, zlib: {} }

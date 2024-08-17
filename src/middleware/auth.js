@@ -4,27 +4,34 @@ import UserService from '../services/user.service.js';
 const { jwtSecret, refreshTokenSecret } = config;
 
 
-  export const authenticate = async (req, res, next) => {
-
-  const token = req.cookies.jwt;
-
-  if (!token) {
-    return res.status(401).json({ error: 'Access denied' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, jwtSecret);
-    const user = await UserService.getUserById(decoded.id); // Usamos el UserService para obtener el usuario
-    if (!user) {
+export const authenticate = async (req, res, next) => {
+    // Intentamos obtener el token desde las cookies
+    let token = req.cookies.jwt;
+  
+    // Si no hay token en las cookies, lo buscamos en el header 'Authorization'
+    if (!token) {
+      const authHeader = req.headers['authorization'];
+      token = authHeader && authHeader.split(' ')[1]; // Obtiene el token del header Authorization
+    }
+  
+    if (!token) {
       return res.status(401).json({ error: 'Access denied' });
     }
-    req.user = user;
-    next();
-  } catch (error) {
+  
+    try {
+      const decoded = jwt.verify(token, jwtSecret);
+      const user = await UserService.getUserById(decoded.id); // Usamos el UserService para obtener el usuario
+      if (!user) {
+        return res.status(401).json({ error: 'Access denied' });
+      }
+      req.user = user;
 
-    res.status(400).json({ error: 'Invalid token' });
-  }
-};
+      next();
+    } catch (error) {
+      res.status(400).json({ error: 'Invalid token' });
+    }
+  };
+  
 
 //exports.authorize = (roles) => {
   export const authorize = (roles) => {

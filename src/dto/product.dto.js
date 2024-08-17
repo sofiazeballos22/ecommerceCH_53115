@@ -1,5 +1,5 @@
 class ProductDTO {
-    constructor({ _id, title, description, code, price, status, stock, category, thumbails }) {
+    constructor({ _id, title, description, code, price, status, stock, category, thumbails,owner }) {
         this.id = _id;
         this.title = title;
         this.description = description; 
