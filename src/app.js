@@ -32,7 +32,7 @@ const __dirname = dirname(__filename);
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:5173',  // Reemplaza con la URL de tu frontend
+  origin: ['https://master--frontend-ch53115.netlify.app', 'http://localhost:5173'],  // Añade tu dominio de Netlify
     credentials: true,                // Permitir el envío de credenciales
 }));
 
