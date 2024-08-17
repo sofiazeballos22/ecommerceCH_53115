@@ -32,18 +32,15 @@ const __dirname = dirname(__filename);
 const app = express();
 
 app.use(cors({
-  origin: ['https://master--frontend-ch53115.netlify.app', 'http://localhost:5173'],  // Añade tu dominio de Netlify
-    credentials: true,                // Permitir el envío de credenciales
+  origin: ['https://master--frontend-ch53115.netlify.app', 'http://localhost:5173', 'http://localhost:3000'],  
+    credentials: true,            
 }));
 
-//app.set('views', join(__dirname, 'views'));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-/*
-app.engine('handlebars', exphbs.engine());
-app.set('view engine', 'handlebars');
-app.set('views', join(__dirname, 'views'));*/
+
 app.use((req, res, next) => {
   req.logger = logger;
   next();
@@ -77,7 +74,7 @@ app.use(compression({
 
 app.use(express.static(join(__dirname, 'public')));
 app.use(session({
-  secret: process.env.JWT_SECRET, // Usar el secreto desde .env
+  secret: process.env.JWT_SECRET, 
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
