@@ -2,7 +2,6 @@ import UserService from '../services/user.service.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import config from '../config/index.js';
-import crypto from 'crypto';
 
 const { jwtSecret, refreshTokenSecret } = config;
 
@@ -34,80 +33,75 @@ const login = async (req, res) => {
         const { email, password } = req.body;
         const { token, refreshToken, user } = await UserService.login(email, password);
 
-
- 
-        res.cookie('jwt', token, { httpOnly: true, secure: true });
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
-
+        // Configuración adecuada de las cookies con SameSite y secure dependiendo del entorno
         res.cookie('jwt', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Solo en HTTPS en producción
-            sameSite: 'lax',
-            path: '/', // Asegura que la cookie esté disponible para todas las rutas
-          });
-    
-          res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Solo en HTTPS en producción
-            sameSite: 'lax',
-            path: '/', // Asegura que la cookie esté disponible para todas las rutas
-          });
-              // Verifica si es una solicitud desde Postman o frontend API
-      
+            secure: process.env.NODE_ENV === 'production',  // En producción asegura HTTPS
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',  // 'None' para diferentes dominios
+            path: '/',  // Disponible para todas las rutas
+            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'  // Dominio correcto
+        });
 
-        res.status(200).json({    message: 'Login exitoso', 
-            token, refreshToken, user });
-     
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',  // En producción asegura HTTPS
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',  // 'None' para diferentes dominios
+            path: '/',  // Disponible para todas las rutas
+            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'  // Dominio correcto
+        });
+
+        res.status(200).json({ message: 'Login exitoso', token, refreshToken, user });
     } catch (error) {
         res.status(401).json({ error: 'Error al iniciar sesión. Verifica tus credenciales.' });
-
     }
 };
-
 
 const refreshToken = async (req, res) => {
     const { refreshToken } = req.cookies;
 
-    if(!refreshToken) return res.status(401).json({ error: 'Acceso denegado' });
+    if (!refreshToken) return res.status(401).json({ error: 'Acceso denegado' });
 
     try {
         const decoded = jwt.verify(refreshToken, refreshTokenSecret);
         const user = await UserService.getUserById(decoded.id);
 
-        if (!user || !user.refreshToken.includes(refreshToken)) return res.status(401).json({ error: 'FCódigo inválido' });
+        if (!user || !user.refreshTokens.includes(refreshToken)) return res.status(401).json({ error: 'Código inválido' });
 
-        const newToken = jtw.sign({ id: user._id, role: user.role }, jwtSecret, { expiresIn: '10m' });
-        const newRefreshToken = jtw.sign({ id: user._id, role: user.role }, refreshToken, { expiresIn: '5d'});
+        const newToken = jwt.sign({ id: user._id, role: user.role }, jwtSecret, { expiresIn: '10m' });
+        const newRefreshToken = jwt.sign({ id: user._id, role: user.role }, refreshTokenSecret, { expiresIn: '5d' });
 
         user.refreshTokens = user.refreshTokens.filter(token => token !== refreshToken);
         user.refreshTokens.push(newRefreshToken);
         await user.save();
 
-        res.cookie('jwt', token, {
+        // Configuración adecuada de las cookies
+        res.cookie('jwt', newToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Solo en HTTPS en producción
-            sameSite: 'lax',
-            path: '/', // Asegura que la cookie esté disponible para todas las rutas
-          });
-    
-          res.cookie('refreshToken', refreshToken, {
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Solo en HTTPS en producción
-            sameSite: 'lax',
-            path: '/', // Asegura que la cookie esté disponible para todas las rutas
-          });
-        res.cookie('jwt', newToken, { httpOnly: true, scure: true });
-        res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: true });
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
+        });
+
         res.json({ message: 'Token refreshed' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to refresh token', details: error.message });
     }
 };
+
 const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         await UserService.requestPasswordReset(email);
-        res.status(200).json({ message: 'Password reset link sent' }); // Enviar respuesta JSON
+        res.status(200).json({ message: 'Password reset link sent' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to request password reset', details: error.message });
     }
@@ -118,8 +112,6 @@ const resetPassword = async (req, res) => {
         const { token, newPassword } = req.body;
         await UserService.resetPassword(token, newPassword);
         res.status(200).json({ message: 'Password has been reset successfully' });
-  
-       // res.json({ message: 'Password has been reset' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -127,16 +119,17 @@ const resetPassword = async (req, res) => {
 
 const deleteInactiveUsers = async (req, res) => {
     try {
-      const deletedUsers = await UserService.deleteInactiveUsers();
-      res.json({ message: 'Inactive users deleted successfully', deletedUsers });
+        const deletedUsers = await UserService.deleteInactiveUsers();
+        res.json({ message: 'Inactive users deleted successfully', deletedUsers });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to delete inactive users', details: error.message });
+        res.status(500).json({ error: 'Failed to delete inactive users', details: error.message });
     }
 };
 
 const getCurrentUser = (req, res) => {
     res.json(req.user);
 };
+
 const logout = async (req, res) => {
     try {
         const { refreshToken } = req.cookies;
@@ -147,9 +140,9 @@ const logout = async (req, res) => {
             await user.save();
         }
 
-        res.clearCookie('jwt');
-        res.clearCookie('refreshToken');
-        res.json({ message: 'Logueado existosamente' });
+        res.clearCookie('jwt', { path: '/' });
+        res.clearCookie('refreshToken', { path: '/' });
+        res.json({ message: 'Logueado exitosamente' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to logout', details: error.message });
     }
@@ -158,7 +151,7 @@ const logout = async (req, res) => {
 const uploadDocuments = async (req, res) => {
     try {
         const userId = req.params.uid;
-        const files = req.files; 
+        const files = req.files;
 
         const documents = [];
         if (files.profile) {
@@ -177,7 +170,7 @@ const uploadDocuments = async (req, res) => {
 
         const user = await UserService.addDocuments(userId, documents);
         if (!user) {
-            return res.status(401).json({ error: 'Usuario no found' });
+            return res.status(401).json({ error: 'Usuario no encontrado' });
         }
         res.json(user);
     } catch (error) {
@@ -185,12 +178,12 @@ const uploadDocuments = async (req, res) => {
     }
 };
 
-const upgradeToPremium = async (req,res) => {
+const upgradeToPremium = async (req, res) => {
     try {
         const userId = req.params.uid;
         let user;
-        
-        if (req.user.role === 'admin' ) { 
+
+        if (req.user.role === 'admin') {
             user = await UserService.upgradeToPremiumAsAdmin(userId);
         } else {
             user = await UserService.upgradeToPremium(userId);
@@ -205,17 +198,15 @@ const upgradeToPremium = async (req,res) => {
         res.status(500).json({ error: 'Failed to upgrade user', details: error.message });
     }
 };
+
 const manageUsers = async (req, res) => {
     try {
-      const users = await UserService.getAllUsers(); // Obten todos los usuarios desde el servicio
-
-      res.status(200).json(users);
+        const users = await UserService.getAllUsers();
+        res.status(200).json(users);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch users', details: error.message });
+        res.status(500).json({ error: 'Failed to fetch users', details: error.message });
     }
-  };
-
-
+};
 
 export default {
     deleteInactiveUsers,

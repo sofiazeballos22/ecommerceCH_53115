@@ -70,14 +70,7 @@ router.post('/generate-fake-users', async (req, res) => {
     res.status(500).json({ error: 'Failed to create fake users', details: error.message });
   }
 });
-router.get('/', authenticate, authorize(['admin']), async (req, res) => {
-  try {
-    const users = await User.find({}, 'first_name last_name email role');
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch users', details: error.message });
-  }
-});
+
 router.delete('/', authenticate, authorize(['admin']), UserController.deleteInactiveUsers);
 
 router.get('/admin/manage-users', authenticate, authorize(['admin']), UserController.manageUsers);
