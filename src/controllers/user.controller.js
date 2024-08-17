@@ -36,17 +36,17 @@ const login = async (req, res) => {
         res.cookie('jwt', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',  // En producción asegura HTTPS
-            sameSite: 'None', // Cambiado a None
+            sameSite: 'None',  // Permite compartir cookies entre dominios
             path: '/',  // Disponible para todas las rutas
-            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'  // Dominio correcto
+            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
         });
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',  // En producción asegura HTTPS
-            sameSite: 'None', // Cambiado a None
+            sameSite: 'None',  // Permite compartir cookies entre dominios
             path: '/',  // Disponible para todas las rutas
-            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'  // Dominio correcto
+            domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
         });
 
         res.status(200).json({ message: 'Login exitoso', token, refreshToken, user });
@@ -76,17 +76,17 @@ const refreshToken = async (req, res) => {
         // Configuración adecuada de las cookies
         res.cookie('jwt', newToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'None', // Cambiado a None
-            path: '/',
+            secure: process.env.NODE_ENV === 'production',  // En producción asegura HTTPS
+            sameSite: 'None',  // Permite compartir cookies entre dominios
+            path: '/',  // Disponible para todas las rutas
             domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
         });
 
         res.cookie('refreshToken', newRefreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'None', // Cambiado a None
-            path: '/',
+            secure: process.env.NODE_ENV === 'production',  // En producción asegura HTTPS
+            sameSite: 'None',  // Permite compartir cookies entre dominios
+            path: '/',  // Disponible para todas las rutas
             domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
         });
 
